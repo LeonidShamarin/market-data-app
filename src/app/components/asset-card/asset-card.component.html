@@ -1,0 +1,11 @@
+<div class="asset-price-card">
+  <div class="price-display">
+    <span class="price">{{ currentPrice | currency }}</span>
+    <span class="updated">Updated: {{ lastUpdated | date:'mediumTime' }}</span>
+  </div>
+  <div class="price-change">
+    <span [class.positive]="true" [class.negative]="false">
+      +2.5% ▲
+    </span>
+  </div>
+</div>

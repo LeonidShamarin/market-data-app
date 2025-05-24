@@ -1,0 +1,24 @@
+<div class="app-container">
+  <div class="asset-list">
+    <div *ngFor="let asset of assets" 
+         class="asset-card" 
+         (click)="selectAsset(asset)"
+         [class.selected]="asset === selectedAsset">
+      <h3>{{ asset.name }}</h3>
+      <p>{{ asset.type }}</p>
+      <p>Last updated: {{ asset.lastUpdated | date:'medium' }}</p>
+    </div>
+  </div>
+
+  <div class="main-content">
+    <div *ngIf="selectedAsset" class="price-display">
+      <h2>{{ selectedAsset.name }}</h2>
+      <app-asset-card [asset]="selectedAsset"></app-asset-card>
+    </div>
+
+    <div *ngIf="selectedAsset" class="chart-container">
+      <h3>Historical Data</h3>
+      <app-historical-chart [assetId]="selectedAsset.id"></app-historical-chart>
+    </div>
+  </div>
+</div>
