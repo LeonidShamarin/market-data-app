@@ -1,5 +1,7 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
+import { FormsModule } from '@angular/forms';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { HttpClientModule } from '@angular/common/http';
 import { NgxEchartsModule } from 'ngx-echarts';
 
@@ -14,6 +16,8 @@ import { HistoricalChartComponent } from './components/historical-chart/historic
     HistoricalChartComponent
   ],
   imports: [
+    FormsModule,
+    MatProgressSpinnerModule,
     BrowserModule,
     HttpClientModule,
     NgxEchartsModule.forRoot({

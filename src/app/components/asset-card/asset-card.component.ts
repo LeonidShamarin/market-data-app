@@ -1,31 +1,22 @@
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
-import { WebSocketService } from '../../services/websocket.service';
-import { Subscription } from 'rxjs';
+import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { Asset } from '../../models/asset.model';
 
 @Component({
   selector: 'app-asset-card',
   templateUrl: './asset-card.component.html',
-  styleUrls: ['./asset-card.component.scss'],
+  styleUrls: ['./asset-card.component.scss']
 })
-export class AssetCardComponent implements OnInit, OnDestroy {
-  @Input() asset: any;
-  currentPrice: number | null = null;
-  lastUpdated: Date | null = null;
-  private socketSubscription!: Subscription;
+export class AssetCardComponent implements OnChanges {
+  @Input() asset!: Asset;
+  currentPrice!: number;
+  priceChange!: number;
+  isPositive!: boolean;
 
-  constructor(private webSocketService: WebSocketService) {}
-
-  ngOnInit(): void {
-    this.socketSubscription = this.webSocketService.connect(this.asset.symbol).subscribe((message) => {
-      if (message.type === 'trade') {
-        this.currentPrice = message.data[0].p;
-        this.lastUpdated = new Date();
-      }
-    });
-  }
-
-  ngOnDestroy(): void {
-    this.webSocketService.disconnect(this.asset.symbol);
-    this.socketSubscription.unsubscribe();
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['asset']) {
+      this.currentPrice = 100 + Math.random() * 50;
+      this.priceChange = Math.random() * 10 - 5;
+      this.isPositive = this.priceChange >= 0;
+    }
   }
 }

@@ -1,0 +1,15 @@
+<div class="chart-controls">
+  <select [(ngModel)]="selectedTimeframe" (change)="onTimeframeChange()" class="timeframe-select">
+    <option *ngFor="let tf of timeframes" [value]="tf.value">{{ tf.label }}</option>
+  </select>
+</div>
+
+<div *ngIf="isLoading" class="loading-spinner">
+  <mat-spinner diameter="50"></mat-spinner>
+</div>
+
+<div *ngIf="error" class="error-message">
+  {{ error }}
+</div>
+
+<div *ngIf="!isLoading && !error" echarts [options]="chartOptions" class="chart"></div>
