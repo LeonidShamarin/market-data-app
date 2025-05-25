@@ -1,30 +1,23 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { FormsModule } from '@angular/forms';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { HttpClientModule } from '@angular/common/http';
-import { NgxEchartsModule } from 'ngx-echarts';
+import { FormsModule } from '@angular/forms';
 
 import { AppComponent } from './app.component';
-import { AssetCardComponent } from './components/asset-card/asset-card.component';
-import { HistoricalChartComponent } from './components/historical-chart/historical-chart.component';
+import { PriceChartComponent } from './components/price-chart/price-chart.component';
+import { MarketDataService } from './services/market-data.service';
 
 @NgModule({
   declarations: [
     AppComponent,
-    AssetCardComponent,
-    HistoricalChartComponent
+    PriceChartComponent
   ],
   imports: [
-    FormsModule,
-    MatProgressSpinnerModule,
     BrowserModule,
     HttpClientModule,
-    NgxEchartsModule.forRoot({
-      echarts: () => import('echarts')
-    })
+    FormsModule
   ],
-  providers: [],
+  providers: [MarketDataService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

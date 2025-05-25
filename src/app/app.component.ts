@@ -1,45 +1,98 @@
-import { Component } from '@angular/core';
-import { Asset } from './models/asset.model';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { MarketDataService } from './services/market-data.service';
+import { Subscription } from 'rxjs';
+
+export interface MarketTick {
+  symbol: string;
+  price: number;
+  timestamp: number;
+  change?: number;
+  changePercent?: number;
+}
+
+export interface HistoricalBar {
+  time: number;
+  open: number;
+  high: number;
+  low: number;
+  close: number;
+  volume: number;
+}
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
-export class AppComponent {
-  assets: Asset[] = [
-    {
-      id: 'AAPL',
-      symbol: 'AAPL',
-      name: 'Apple Inc.',
-      type: 'Stock',
-      lastUpdated: new Date()
-    },
-    {
-      id: 'MSFT',
-      symbol: 'MSFT',
-      name: 'Microsoft Corp.',
-      type: 'Stock',
-      lastUpdated: new Date()
-    },
-    {
-      id: 'TSLA',
-      symbol: 'TSLA',
-      name: 'Tesla Inc.',
-      type: 'Stock',
-      lastUpdated: new Date()
-    },
-    {
-      id: 'BTC-USD',
-      symbol: 'BTC-USD',
-      name: 'Bitcoin',
-      type: 'Crypto',
-      lastUpdated: new Date()
-    }
-  ];
-  selectedAsset: Asset = this.assets[0];
+export class AppComponent implements OnInit, OnDestroy {
+  title = 'Market Data App';
+  currentTick: MarketTick | null = null;
+  historicalData: HistoricalBar[] = [];
+  isConnected = false;
+  selectedSymbol = 'EUR/USD';
+  availableSymbols = ['EUR/USD', 'GBP/USD', 'USD/JPY', 'AUD/USD'];
+  private subscriptions: Subscription[] = [];
 
-  selectAsset(asset: Asset): void {
-    this.selectedAsset = asset;
+  constructor(private marketDataService: MarketDataService) {}
+
+  ngOnInit() {
+    this.initializeConnection();
+    this.subscribeToMarketData();
+    this.loadHistoricalData();
+  }
+
+  ngOnDestroy() {
+    this.subscriptions.forEach(sub => sub.unsubscribe());
+    this.marketDataService.disconnect();
+  }
+
+  private async initializeConnection() {
+    try {
+      await this.marketDataService.authenticate();
+      this.marketDataService.connect();
+      this.isConnected = true;
+    } catch (error) {
+      console.error('Failed to initialize connection:', error);
+    }
+  }
+
+  private subscribeToMarketData() {
+    const tickSub = this.marketDataService.getMarketTicks().subscribe(
+      tick => {
+        if (tick.symbol === this.selectedSymbol) {
+          this.currentTick = tick;
+        }
+      },
+      error => console.error('Market data error:', error)
+    );
+    this.subscriptions.push(tickSub);
+
+    const connectionSub = this.marketDataService.getConnectionStatus().subscribe(
+      status => this.isConnected = status
+    );
+    this.subscriptions.push(connectionSub);
+  }
+
+  private async loadHistoricalData() {
+    try {
+      this.historicalData = await this.marketDataService.getHistoricalData(
+        this.selectedSymbol,
+        '1',
+        'minute',
+        100
+      );
+    } catch (error) {
+      console.error('Failed to load historical data:', error);
+    }
+  }
+
+  onSymbolChange() {
+    this.loadHistoricalData();
+    this.marketDataService.subscribeToSymbol(this.selectedSymbol);
+  }
+
+  reconnect() {
+    this.initializeConnection();
   }
 }
+
