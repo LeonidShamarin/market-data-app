@@ -1,4 +1,7 @@
 # Market-data-app
+This is a demonstration of the main page:
+
+![Main Page](public/main-page.png)
 
 ---
 
